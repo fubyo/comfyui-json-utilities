@@ -117,12 +117,58 @@ class GetJSONItem:
         return (convert_to_dict(item),)
 
 
+class GetDictValue:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "json_dict": ("DICT",),
+                "key": ("STRING", {"default": ""}),
+            }
+        }
+
+    RETURN_TYPES = ("STRING", "INT", "FLOAT")
+    RETURN_NAMES = ("string_value", "int_value", "float_value")
+    FUNCTION = "extract"
+    CATEGORY = "JSON"
+
+    def extract(self, json_dict, key):
+        if not json_dict:
+            return ("", 0, 0.0)
+        
+        if key not in json_dict:
+            return ("", 0, 0.0)
+        
+        value = json_dict[key]
+        
+        if isinstance(value, bool):
+            str_val = "true" if value else "false"
+            int_val = 1 if value else 0
+            float_val = 1.0 if value else 0.0
+        elif isinstance(value, type(None)):
+            str_val = "null"
+            int_val = 0
+            float_val = 0.0
+        elif isinstance(value, (int, float)):
+            str_val = str(value)
+            int_val = int(value)
+            float_val = float(value)
+        else:
+            str_val = str(value) if value else ""
+            int_val = 0
+            float_val = 0.0
+        
+        return (str_val, int_val, float_val)
+
+
 NODE_CLASS_MAPPINGS = {
     "LoadJSON": LoadJSON,
     "GetJSONItem": GetJSONItem,
+    "GetDictValue": GetDictValue,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "LoadJSON": "Load JSON",
     "GetJSONItem": "Get JSON Item",
+    "GetDictValue": "Get Dict Value",
 }
