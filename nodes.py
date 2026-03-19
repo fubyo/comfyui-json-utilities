@@ -3,6 +3,22 @@ import os
 import folder_paths
 
 
+def convert_to_dict(value):
+    """Convert a JSON value to a dict with nested objects/arrays as strings."""
+    if isinstance(value, dict):
+        result = {}
+        for key, val in value.items():
+            if isinstance(val, (dict, list)):
+                result[key] = json.dumps(val, separators=(',', ':'))
+            else:
+                result[key] = val
+        return result
+    elif isinstance(value, list):
+        return {"value": json.dumps(value, separators=(',', ':'))}
+    else:
+        return {"value": value}
+
+
 class LoadJSON:
     @classmethod
     def INPUT_TYPES(s):
@@ -65,10 +81,48 @@ class LoadJSON:
         return True
 
 
+class GetJSONItem:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "json_string": ("STRING", {"default": ""}),
+                "index": ("INT", {"default": 0, "min": -999999, "max": 999999}),
+            }
+        }
+
+    RETURN_TYPES = ("DICT",)
+    RETURN_NAMES = ("json_dict",)
+    FUNCTION = "get_item"
+    CATEGORY = "JSON"
+
+    def get_item(self, json_string, index):
+        if not json_string or not json_string.strip():
+            raise ValueError("No JSON string provided")
+
+        try:
+            data = json.loads(json_string)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Invalid JSON string: {str(e)}")
+
+        if isinstance(data, list):
+            if len(data) == 0:
+                raise ValueError("JSON array is empty")
+            
+            clamped_index = max(0, min(index, len(data) - 1))
+            item = data[clamped_index]
+        else:
+            item = data
+
+        return (convert_to_dict(item),)
+
+
 NODE_CLASS_MAPPINGS = {
     "LoadJSON": LoadJSON,
+    "GetJSONItem": GetJSONItem,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "LoadJSON": "Load JSON",
+    "GetJSONItem": "Get JSON Item",
 }
