@@ -4,10 +4,18 @@ Custom utility nodes for ComfyUI to work with JSON files and objects.
 
 ## Features
 
-- Load and save JSON files
-- Parse and format JSON data
-- Transform and manipulate JSON objects
-- Integrate JSON workflows with ComfyUI pipelines
+**Available Nodes:**
+- **Load JSON**: Load JSON files from disk with file upload button or direct path input
+- **Get JSON Item**: Extract items from JSON arrays by index, with nested object/array serialization
+- **Get Dict Value**: Extract typed values (string, int, float) from dictionaries by key
+
+**Key Capabilities:**
+- Upload JSON files via browser file picker
+- Auto-detect UTF-8 encoding and validate JSON syntax
+- Extract array items with index clamping to valid range
+- Convert nested objects/arrays to compact JSON strings
+- Type-aware value extraction with automatic conversion
+- Handle booleans, numbers, strings, null, and missing keys appropriately
 
 ## Installation
 
